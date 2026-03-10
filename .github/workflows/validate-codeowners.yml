@@ -1,0 +1,30 @@
+name: Validate Codeowners
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-codeowners:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    # Pinned to SHA — upstream issue #173 still open but workaround in place (split steps)
+    - uses: mszostok/codeowners-validator@7f3f5e28c6d7b8dfae5731e54ce2272ca384592f # v0.7.4
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+      name: "Full check of CODEOWNERS"
+      with:
+        checks: "syntax,duppatterns"
+        github_access_token: "${{ secrets.GITHUB_TOKEN }}"
+    # Pinned to SHA — upstream issue #173 still open but workaround in place (split steps)
+    - uses: mszostok/codeowners-validator@7f3f5e28c6d7b8dfae5731e54ce2272ca384592f # v0.7.4
+      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+      name: "Syntax check of CODEOWNERS"
+      with:
+        checks: "syntax,duppatterns"
