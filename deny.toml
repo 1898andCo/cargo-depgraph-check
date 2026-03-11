@@ -1,0 +1,25 @@
+# cargo-deny configuration
+# Schema valid for cargo-deny v0.16+ (used by cargo-deny-action@v2)
+
+[advisories]
+ignore = []
+yanked = "warn"
+
+[licenses]
+allow = [
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "MIT",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "ISC",
+  "Unicode-3.0",
+  "Zlib",
+]
+
+[bans]
+multiple-versions = "warn"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

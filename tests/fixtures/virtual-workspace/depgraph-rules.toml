@@ -1,0 +1,6 @@
+[rules]
+lib-x = []
+lib-y = ["lib-x"]
+
+[options]
+strict = true
