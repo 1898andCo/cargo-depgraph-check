@@ -124,6 +124,7 @@ dependencies = [
  "insta",
  "predicates",
  "serde",
+ "serde_json",
  "thiserror",
  "toml",
 ]
