@@ -1,0 +1,8 @@
+# References a crate that doesn't exist in the workspace
+[rules]
+only-crate = []
+ghost-crate = ["only-crate"]
+
+[options]
+strict = true
+unmatched_config_entries = "warn"
