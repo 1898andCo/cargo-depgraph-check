@@ -11,7 +11,7 @@ readme = "README.md"
 keywords = ["cargo-subcommand", "dependency-graph", "workspace", "linter", "architecture"]
 categories = ["development-tools::cargo-plugins"]
 exclude = [
-    "tests/fixtures/**/*",
+    "tests/**/*",
     ".github/**/*",
 ]
 
