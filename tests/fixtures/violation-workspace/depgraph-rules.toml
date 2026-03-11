@@ -1,0 +1,8 @@
+# api is NOT allowed to depend on server
+[rules]
+core = []
+api = ["core"]
+server = ["core", "api"]
+
+[options]
+strict = true

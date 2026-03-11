@@ -11,16 +11,29 @@ use cargo_depgraph_check::metadata::{WorkspaceGraph, generate_config};
 use cargo_depgraph_check::report::{ColorMode, report_json, report_text};
 use cargo_depgraph_check::validate::validate;
 
+/// Cargo subcommand wrapper. Handles both:
+/// - `cargo depgraph-check check` (argv: cargo-depgraph-check depgraph-check check)
+/// - `cargo-depgraph-check check` (argv: cargo-depgraph-check check)
 #[derive(Parser)]
 #[command(
-    name = "cargo-depgraph-check",
+    name = "cargo",
+    bin_name = "cargo",
     version,
-    about = "Enforce workspace crate dependency graph rules via allowlist configuration",
-    multicall = true
+    about = "Enforce workspace crate dependency graph rules via allowlist configuration"
 )]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: CargoSubcommand,
+}
+
+#[derive(Subcommand)]
+enum CargoSubcommand {
+    /// Enforce workspace crate dependency graph rules
+    #[command(name = "depgraph-check")]
+    DepgraphCheck {
+        #[command(subcommand)]
+        command: Commands,
+    },
 }
 
 #[derive(Subcommand)]
@@ -70,24 +83,36 @@ enum ColorChoice {
 }
 
 fn main() -> ExitCode {
-    let cli = Cli::parse();
+    // Handle both direct invocation and cargo subcommand invocation.
+    // When invoked as `cargo depgraph-check check`, argv is:
+    //   ["cargo-depgraph-check", "depgraph-check", "check", ...]
+    // When invoked directly as `cargo-depgraph-check check`, argv is:
+    //   ["cargo-depgraph-check", "check", ...]
+    // We insert "depgraph-check" if the first arg after binary isn't it.
+    let args: Vec<String> = std::env::args().collect();
+    let effective_args = if args.len() > 1 && args[1] != "depgraph-check" {
+        let mut new_args = vec![args[0].clone(), "depgraph-check".to_string()];
+        new_args.extend_from_slice(&args[1..]);
+        new_args
+    } else {
+        args
+    };
 
-    match cli.command {
-        Some(Commands::Check {
+    let cli = Cli::parse_from(effective_args);
+
+    let CargoSubcommand::DepgraphCheck { command } = cli.command;
+
+    match command {
+        Commands::Check {
             manifest_path,
             config: config_path,
             format,
             color,
-        }) => run_check(manifest_path, config_path, format, color),
-        Some(Commands::Generate {
+        } => run_check(manifest_path, config_path, format, color),
+        Commands::Generate {
             manifest_path,
             output,
-        }) => run_generate(manifest_path, output),
-        None => {
-            use clap::CommandFactory;
-            Cli::command().print_help().ok();
-            ExitCode::from(2)
-        }
+        } => run_generate(manifest_path, output),
     }
 }
 

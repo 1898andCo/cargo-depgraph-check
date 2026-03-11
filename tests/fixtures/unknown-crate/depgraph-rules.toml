@@ -1,0 +1,6 @@
+# Only alpha is listed — beta is missing
+[rules]
+alpha = []
+
+[options]
+strict = true

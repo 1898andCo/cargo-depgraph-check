@@ -1,0 +1,9 @@
+[rules]
+crate-a = []
+crate-b = ["crate-a"]
+crate-c = ["crate-a", "crate-b"]
+
+[options]
+strict = true
+check_dev_deps = false
+unmatched_config_entries = "warn"
